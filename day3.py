@@ -4,10 +4,9 @@ response = requests.get(url)
 print(response.status_code)
 
 data = response.json()
-print(data)
 
 races = data["MRData"]["RaceTable"]["Races"]
+
 for race in races:
-    print(race["raceName"])
-    print(race["date"])
-    print(race["time"])
+    if race["date"] == "2026-09-06":
+        print(race["raceName"])
