@@ -7,6 +7,7 @@ data = response.json()
 print(data)
 
 races = data["MRData"]["RaceTable"]["Races"]
-print(races[0]["raceName"])
-print(races[0]["date"])
-print(races[0]["time"])
+for race in races:
+    print(race["raceName"])
+    print(race["date"])
+    print(race["time"])
