@@ -14,7 +14,7 @@ def get_f1_races():
 
     return races
 
-def convert_to_taiwan_time(session):
+def convert_to_tw_time(session):
         datetime_text = session["date"] + " " + session["time"]
 
         utc_time = datetime.strptime(
@@ -24,9 +24,9 @@ def convert_to_taiwan_time(session):
 
         utc_time = utc_time.replace(tzinfo=timezone.utc)
 
-        taiwan_time = utc_time.astimezone(taiwan_timezone)
+        tw_time = utc_time.astimezone(taiwan_timezone)
 
-        return taiwan_time
+        return tw_time
 
 races = get_f1_races()
 print("比賽總數:",len(races))
@@ -44,7 +44,7 @@ for race in races:
 
      for session_name in session_names:
           if session_name in race:
-               taiwan_time = convert_to_taiwan_time(
+               tw_time = convert_to_tw_time(
                     race[session_name]
                )
-               print(session_name, "→", taiwan_time)
+               print(session_name, "→", tw_time)
