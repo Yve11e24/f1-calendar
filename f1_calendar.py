@@ -1,9 +1,10 @@
 import requests
 from datetime import datetime, timezone, timedelta
 
-taiwan_timezone = timezone(timedelta(hours=8))
+# 設定
+TAIWAN_TIMEZONE = timezone(timedelta(hours=8))
 
-session_durations = {
+SESSION_DURATIONS = {
     "FirstPractice": timedelta(hours=1),
     "SecondPractice": timedelta(hours=1),
     "ThirdPractice": timedelta(hours=1),
@@ -12,11 +13,20 @@ session_durations = {
     "Race": timedelta(hours=2)
 }
 
-def get_f1_races():
-    url = "https://api.jolpi.ca/ergast/f1/2026.json"
+SESSION_NAMES = [
+     "FirstPractice",
+     "SecondPractice",
+     "ThirdPractice",
+     "Sprint",
+     "Qualifying",
+     ]
 
+API_URL = "https://api.jolpi.ca/ergast/f1/2026.json"
+
+# 取得F1資料
+def get_f1_races():
     try:
-         response = requests.get(url, timeout=10)
+         response = requests.get(API_URL, timeout=10)
          response.raise_for_status()
 
          data = response.json()
@@ -30,7 +40,7 @@ def get_f1_races():
          print("API 回傳資料格式不符合預期:", error)
          return []
     
-
+# 時間處理
 def convert_to_tw_time(session):
         datetime_text = session["date"] + " " + session["time"]
 
@@ -41,14 +51,16 @@ def convert_to_tw_time(session):
 
         utc_time = utc_time.replace(tzinfo=timezone.utc)
 
-        tw_time = utc_time.astimezone(taiwan_timezone)
+        tw_time = utc_time.astimezone(TAIWAN_TIMEZONE)
 
         return tw_time
 
 def format_ics_datetime(dt):
      utc_time = dt.astimezone(timezone.utc)
+
      return utc_time.strftime("%Y%m%dT%H%M%SZ")
 
+# 建立行事曆
 def create_ics(sessions):
      lines = []
      
@@ -72,6 +84,7 @@ def create_ics(sessions):
 
      lines.append("END:VCALENDAR")
      return "\n".join(lines)
+
 def main():
      races = get_f1_races()
 
@@ -81,21 +94,13 @@ def main():
 
      print("比賽總數:",len(races))
 
-     session_names = [
-     "FirstPractice",
-     "SecondPractice",
-     "ThirdPractice",
-     "Sprint",
-     "Qualifying",
-     ]
-
      all_sessions = []
 
      for race in races:
           print("\n", race["raceName"])
 
           sessions = []
-          for session_name in session_names:
+          for session_name in SESSION_NAMES:
                if session_name in race:
                     start_time = convert_to_tw_time(
                          race[session_name]
@@ -103,7 +108,7 @@ def main():
 
                     end_time = (
                          start_time
-                         + session_durations[session_name]
+                         + SESSION_DURATIONS[session_name]
                     )
 
                     session = {
@@ -123,7 +128,7 @@ def main():
           start_time = convert_to_tw_time(race_session)
           end_time = (
                start_time
-               + session_durations["Race"]
+               + SESSION_DURATIONS["Race"]
           )
 
           session = {
